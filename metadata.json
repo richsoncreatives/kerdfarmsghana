@@ -1,0 +1,6 @@
+{
+  "name": "Kerd Farms - Agricultural Supply & Fresh Produce Ghana",
+  "description": "Kerd Farms supplies fresh farm eggs, fruits & vegetables, seedlings, and organic manure across Ghana. Order online with Mobile Money (MoMo) payment and direct email tracking to kerdfarms@gmail.com.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
