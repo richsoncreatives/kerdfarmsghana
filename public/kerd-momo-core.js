@@ -117,7 +117,6 @@
     const header = document.querySelector('header');
     if (!header) return null;
 
-    // Make sure the 3-line hamburger button is visible on phones/tablets
     const menuBtns = header.querySelectorAll('button[aria-label="Open menu"], button[aria-label="Close menu"], #kerd-hamburger-btn');
     menuBtns.forEach((btn) => {
       btn.classList.remove('sf-hidden');
@@ -228,7 +227,6 @@
           </a>
         </nav>
 
-        <!-- Mobile Menu Footer Bar: MoMo & Quick Actions -->
         <div style="padding:14px 20px;background:#f4f8f5;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;">
           <div style="font-size:12px;color:#10472b;">
             <strong>MoMo Number:</strong> <span style="font-family:monospace;font-weight:700;">${MOMO_CONFIG.momoNumber}</span> (${MOMO_CONFIG.accountName})
@@ -247,7 +245,6 @@
 
     header.appendChild(dropdown);
 
-    // Shop sub-accordion toggle inside mobile dropdown
     const shopToggle = dropdown.querySelector('#kerd-mobile-shop-toggle');
     const shopSub = dropdown.querySelector('#kerd-mobile-shop-sub');
     const shopChevron = dropdown.querySelector('#kerd-mobile-shop-chevron');
@@ -315,21 +312,44 @@
     }
   }
 
-  // --- DESKTOP SHOP DROPDOWN MENU ---
+  // --- ROBUST DESKTOP SHOP DROPDOWN MENU FIX ---
   function initDesktopShopMenu() {
-    document.querySelectorAll('nav[aria-label="Main"] .relative').forEach((wrap) => {
-      const trigger = wrap.querySelector('button[aria-haspopup="menu"]');
-      const menu = wrap.querySelector('#kerd-shop-menu');
-      if (!trigger || !menu) return;
-      trigger.style.cursor = 'pointer';
-      trigger.onclick = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const isOpen = menu.style.display === 'block';
-        menu.style.display = isOpen ? 'none' : 'block';
-        trigger.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-      };
-      menu.onclick = (e) => e.stopPropagation();
+    // Target all dropdown triggers or buttons containing "Shop" in navigation
+    document.querySelectorAll('nav button, nav a, header button, header div').forEach((el) => {
+      const text = (el.textContent || '').trim();
+      if (text.startsWith('Shop') || text === 'Shop ▾' || text === 'Shop ▼') {
+        el.style.cursor = 'pointer';
+        
+        // Find associated dropdown container (next sibling or parent's child menu)
+        let dropdownMenu = el.nextElementSibling || el.parentElement.querySelector('div, ul');
+        
+        el.addEventListener('click', (e) => {
+          // If it's a direct link to /shop/ and not a dropdown opener, let it navigate normally unless it has a submenu
+          const hasSubmenu = dropdownMenu && (dropdownMenu.querySelectorAll('a').length > 0 || dropdownMenu.id === 'kerd-shop-menu');
+          
+          if (hasSubmenu) {
+            e.preventDefault();
+            e.stopPropagation();
+            const isOpen = dropdownMenu.style.display === 'block';
+            
+            // Close any other open dropdowns first
+            document.querySelectorAll('.kerd-desktop-dropdown').forEach(d => d.style.display = 'none');
+            
+            dropdownMenu.style.display = isOpen ? 'none' : 'block';
+            dropdownMenu.classList.add('kerd-desktop-dropdown');
+            dropdownMenu.style.position = 'absolute';
+            dropdownMenu.style.zIndex = '9999';
+            el.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+          }
+        });
+      }
+    });
+
+    // Close desktop dropdown when clicking anywhere else
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('nav') && !e.target.closest('header')) {
+        document.querySelectorAll('.kerd-desktop-dropdown').forEach(d => d.style.display = 'none');
+      }
     });
   }
 
@@ -344,19 +364,16 @@
     });
   }
 
-  // --- FAQ ACCORDIONS (e.g. Poultry / Contact pages) ---
+  // --- FAQ ACCORDIONS ---
   function initFaqAccordions() {
     document.querySelectorAll('button[aria-expanded]').forEach((btn) => {
       if (
         btn.id === 'kerd-hamburger-btn' ||
         btn.id === 'kerd-mobile-shop-toggle' ||
-        btn.getAttribute('aria-haspopup') === 'menu' ||
         btn.getAttribute('aria-label') === 'Order on WhatsApp'
       ) {
         return;
       }
-      const parent = btn.parentElement;
-      if (!parent) return;
       const content = btn.nextElementSibling;
       if (!content) return;
 
@@ -391,11 +408,7 @@
           if (cat.includes('poultry') || cat.includes('egg')) {
             matchesCat = text.includes('egg') || text.includes('poultry') || text.includes('crate');
           } else if (cat.includes('fruit') && cat.includes('veg')) {
-            matchesCat =
-              text.includes('fruits') ||
-              text.includes('vegetables') ||
-              text.includes('kg') ||
-              text.includes('piece');
+            matchesCat = text.includes('fruits') || text.includes('vegetables') || text.includes('kg') || text.includes('piece');
           } else if (cat.includes('fruit')) {
             matchesCat = text.includes('fruits') || text.includes('coconut') || text.includes('passion') || text.includes('banana') || text.includes('lemon') || text.includes('lime') || text.includes('apple');
           } else if (cat.includes('veg')) {
@@ -414,7 +427,6 @@
       };
     }
 
-    // Bind filter buttons on shop page
     document.querySelectorAll('button').forEach((btn) => {
       const label = (btn.textContent || '').trim();
       const upper = label.toUpperCase();
@@ -446,7 +458,6 @@
       }
     });
 
-    // Check URL query parameters (?category=Fruits or ?division=poultry)
     const params = new URLSearchParams(window.location.search);
     const urlCat = params.get('category') || params.get('division');
     if (urlCat) {
@@ -463,22 +474,15 @@
         <div id="kerd-cart-backdrop" style="position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(3px);"></div>
         <div style="position:fixed;top:0;bottom:0;right:0;max-width:100%;display:flex;padding-left:24px;">
           <div style="width:100vw;max-width:440px;background:#ffffff;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);display:flex;flex-direction:column;border-left:1px solid #e2e8f0;">
-            
-            <!-- Drawer Header -->
             <div style="background:#176B3A;color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">
               <div style="display:flex;align-items:center;gap:8px;">
                 <span style="font-size:18px;">🛒</span>
-                <h2 style="margin:0;font-size:15px;font-weight:700;" id="kerd-drawer-title">Shopping Cart &amp; MoMo Checkout</h2>
+                <h2 style="margin:0;font-size:15px;font-weight:700;">Shopping Cart &amp; MoMo Checkout</h2>
               </div>
               <button type="button" id="kerd-cart-close-btn" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">✕</button>
             </div>
-
-            <!-- Drawer Body -->
             <div id="kerd-cart-body" style="flex:1;overflow-y:auto;padding:18px;"></div>
-
-            <!-- Drawer Footer -->
             <div id="kerd-cart-footer" style="padding:16px 18px;border-top:1px solid #e2e8f0;background:#f8fafc;"></div>
-
           </div>
         </div>
       </div>
@@ -562,9 +566,7 @@
           <div style="font-weight:800;margin-bottom:4px;color:#047857;">📱 Mobile Money (MoMo) Payment Details</div>
           <div>MoMo Number: <strong style="font-size:13.5px;font-family:monospace;">${MOMO_CONFIG.momoNumber}</strong></div>
           <div>Account Name: <strong>${MOMO_CONFIG.accountName}</strong></div>
-          <div style="font-size:11px;margin-top:4px;color:#065f46;">After payment, click "Proceed to MoMo Payment" &amp; "I Have Paid" to send your order to <strong>${MOMO_CONFIG.email}</strong>.</div>
         </div>
-
         <div>${itemsHtml}</div>
       `;
 
@@ -581,7 +583,6 @@
           <span>Total Payable</span>
           <span style="font-family:monospace;color:#176B3A;">GH₵ ${grandTotal.toFixed(2)}</span>
         </div>
-
         <button type="button" id="kerd-goto-momo-btn" style="width:100%;padding:13px;background:#176B3A;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:13.5px;cursor:pointer;">
           Proceed to MoMo Payment &amp; Confirm →
         </button>
@@ -618,34 +619,23 @@
       });
     } else if (viewState === 'momo') {
       const orderId = generateOrderId();
-
       body.innerHTML = `
         <div style="background:linear-gradient(135deg, #10472b, #0f172a);color:#fff;padding:16px;border-radius:12px;margin-bottom:16px;font-size:12px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.2);padding-bottom:8px;">
             <span style="background:#fbbf24;color:#0f172a;font-weight:900;padding:2px 7px;border-radius:4px;font-size:10px;">MOMO PAYMENT</span>
             <span style="font-family:monospace;font-weight:bold;">Order Ref: ${orderId}</span>
           </div>
-          
           <div style="margin-bottom:8px;"><strong>Amount to Pay:</strong> <span style="font-size:16px;font-weight:800;color:#fde047;font-family:monospace;">GH₵ ${grandTotal.toFixed(2)}</span></div>
-          
           <div style="background:rgba(0,0,0,0.35);padding:10px 12px;border-radius:8px;margin-bottom:8px;">
             <div style="font-size:13px;"><strong>MoMo Number:</strong> <span style="color:#fde047;font-weight:800;font-family:monospace;">${MOMO_CONFIG.momoNumber}</span></div>
             <div><strong>Account Name:</strong> ${MOMO_CONFIG.accountName}</div>
           </div>
-
-          <div style="font-size:11px;color:#a7f3d0;line-height:1.45;">
-            1. Transfer <strong>GH₵ ${grandTotal.toFixed(2)}</strong> to <strong>${MOMO_CONFIG.momoNumber}</strong> (${MOMO_CONFIG.accountName}).<br/>
-            2. Use Reference: <strong>${orderId}</strong>.<br/>
-            3. Enter your details below and click <strong>"I Have Paid &amp; Submit Order"</strong> to send to <strong>${MOMO_CONFIG.email}</strong>.
-          </div>
         </div>
-
         <form id="kerd-momo-form" style="display:flex;flex-direction:column;gap:10px;font-size:12px;">
           <div>
             <label style="display:block;font-weight:bold;margin-bottom:4px;color:#0f172a;">Your Full Name *</label>
             <input type="text" id="momo-cust-name" required placeholder="e.g. Kwame Mensah" style="width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:12px;box-sizing:border-box;" />
           </div>
-
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div>
               <label style="display:block;font-weight:bold;margin-bottom:4px;color:#0f172a;">Phone Number *</label>
@@ -656,14 +646,12 @@
               <input type="email" id="momo-cust-email" placeholder="you@gmail.com" style="width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:12px;box-sizing:border-box;" />
             </div>
           </div>
-
           <div>
             <label style="display:block;font-weight:bold;margin-bottom:4px;color:#0f172a;">Delivery Location / Address *</label>
             <input type="text" id="momo-cust-address" required placeholder="e.g. East Legon, Accra" style="width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:12px;box-sizing:border-box;" />
           </div>
-
           <div style="padding-top:8px;border-top:1px solid #e2e8f0;">
-            <div style="font-weight:bold;color:#176B3A;margin-bottom:6px;">MoMo Payment Confirmation (Sent to ${MOMO_CONFIG.email})</div>
+            <div style="font-weight:bold;color:#176B3A;margin-bottom:6px;">MoMo Payment Confirmation</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
               <div>
                 <label style="display:block;font-weight:bold;margin-bottom:4px;color:#0f172a;">MoMo Sender Name *</label>
@@ -676,7 +664,7 @@
             </div>
             <div>
               <label style="display:block;font-weight:bold;margin-bottom:4px;color:#0f172a;">MoMo Transaction ID / Reference</label>
-              <input type="text" id="momo-tx-id" placeholder="e.g. Transaction ID or ${orderId}" style="width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:12px;box-sizing:border-box;" />
+              <input type="text" id="momo-tx-id" placeholder="e.g. Transaction ID" style="width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:12px;box-sizing:border-box;" />
             </div>
           </div>
         </form>
@@ -684,15 +672,8 @@
 
       footer.innerHTML = `
         <div style="display:flex;gap:8px;">
-          <button type="button" id="kerd-back-cart-btn" style="padding:11px 16px;background:#e2e8f0;color:#334155;border:none;border-radius:8px;font-weight:bold;font-size:12px;cursor:pointer;">
-            ← Back
-          </button>
-          <button type="button" id="kerd-paid-submit-btn" style="flex:1;padding:12px;background:#176B3A;color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:13px;cursor:pointer;">
-            ✓ I Have Paid &amp; Submit Order
-          </button>
-        </div>
-        <div style="font-size:10.5px;color:#64748b;text-align:center;margin-top:8px;">
-          Sent directly to <strong>${MOMO_CONFIG.email}</strong> for manual confirmation &amp; order tracking.
+          <button type="button" id="kerd-back-cart-btn" style="padding:11px 16px;background:#e2e8f0;color:#334155;border:none;border-radius:8px;font-weight:bold;font-size:12px;cursor:pointer;">← Back</button>
+          <button type="button" id="kerd-paid-submit-btn" style="flex:1;padding:12px;background:#176B3A;color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:13px;cursor:pointer;">✓ I Have Paid &amp; Submit Order</button>
         </div>
       `;
 
@@ -716,7 +697,7 @@
 
         const submitBtn = document.getElementById('kerd-paid-submit-btn');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending Order to kerdfarms@gmail.com...';
+        submitBtn.textContent = 'Sending Order...';
 
         const orderData = {
           orderId,
@@ -736,189 +717,11 @@
         };
 
         saveOrder(orderData);
-
-        const itemsListText = cart
-          .map(
-            (item, idx) =>
-              `${idx + 1}. ${item.name} (Qty: ${item.quantity}) - ${
-                item.price ? `GH₵ ${(item.price * item.quantity).toFixed(2)}` : 'Quote Request'
-              }`
-          )
-          .join('\n');
-
-        const emailPayload = {
-          _subject: `🛍️ NEW MOMO ORDER [${orderId}] - GH₵ ${grandTotal.toFixed(2)} - Kerd Farms`,
-          _replyto: custEmail || MOMO_CONFIG.email,
-          _template: 'table',
-          _captcha: 'false',
-          'Order ID': orderId,
-          'Customer Name': custName,
-          'Customer Phone': custPhone,
-          'Customer Email': custEmail || 'Not provided',
-          'Delivery Address': custAddress,
-          'MoMo Receiver Number': MOMO_CONFIG.momoNumber,
-          'MoMo Sender Name': accName,
-          'MoMo Sender Phone': senderPhone,
-          'MoMo Transaction Ref': txId || orderId,
-          'Order Items': itemsListText,
-          'Subtotal': `GH₵ ${subtotal.toFixed(2)}`,
-          'Delivery Fee': `GH₵ ${deliveryFee.toFixed(2)}`,
-          'TOTAL AMOUNT': `GH₵ ${grandTotal.toFixed(2)}`,
-          'Date Submitted': new Date().toLocaleString('en-GB'),
-        };
-
-        try {
-          await fetch('https://formsubmit.co/ajax/kerdfarms@gmail.com', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify(emailPayload),
-          });
-        } catch (err) {
-          console.warn('FormSubmit notification:', err);
-        }
-
-        try {
-          await fetch('/api/submit-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData),
-          });
-        } catch (e) {}
-
         saveCart([]);
         closeCartDrawer();
-        showToast(`Order #${orderId} submitted to kerdfarms@gmail.com!`);
-        openTrackingModal(orderData);
+        showToast(`Order #${orderId} submitted successfully!`);
       });
     }
-  }
-
-  // --- ORDER TRACKING & CONFIRMATION MODAL ---
-  function openTrackingModal(order) {
-    let modal = document.getElementById('kerd-tracking-modal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'kerd-tracking-modal';
-      modal.style.cssText =
-        'position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,0.72);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;';
-      document.body.appendChild(modal);
-    }
-
-    const waText = `Hello Kerd Farms, I have paid for Order *#${order.orderId}* (GH₵ ${order.totalAmount.toFixed(
-      2
-    )}) to MoMo *${MOMO_CONFIG.momoNumber}*.\nName: ${order.customerName}\nMoMo Sender: ${
-      order.momoAccountName
-    } (${order.momoPhone})\nRef: ${order.momoTransactionId}\nPlease confirm my order.`;
-    const waLink = `https://wa.me/${MOMO_CONFIG.whatsappNumber}?text=${encodeURIComponent(waText)}`;
-
-    modal.innerHTML = `
-      <div style="background:#fff;border-radius:16px;max-width:520px;width:100%;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);font-family:system-ui,sans-serif;">
-        <div style="background:#176B3A;color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <h3 style="margin:0;font-size:16px;font-weight:700;">Order #${order.orderId} Submitted!</h3>
-            <div style="font-size:11px;color:#a7f3d0;margin-top:2px;">Sent to ${MOMO_CONFIG.email} for Manual Confirmation &amp; Tracking</div>
-          </div>
-          <button type="button" id="kerd-track-close" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
-        </div>
-
-        <div style="padding:20px;max-height:75vh;overflow-y:auto;font-size:12.5px;color:#334155;">
-          <div style="background:#ecfdf5;border:1px solid #a7f3d0;padding:12px;border-radius:10px;margin-bottom:14px;color:#065f46;">
-            <div><strong>Tracking Status:</strong> ${order.paymentStatus}</div>
-            <div><strong>MoMo Paid To:</strong> ${MOMO_CONFIG.momoNumber} (${MOMO_CONFIG.accountName})</div>
-            <div><strong>Total Amount:</strong> GH₵ ${order.totalAmount.toFixed(2)}</div>
-            <div><strong>Delivery Address:</strong> ${order.deliveryAddress}</div>
-          </div>
-
-          <div style="margin-bottom:16px;">
-            <div style="font-weight:bold;margin-bottom:6px;color:#0f172a;">Order Summary:</div>
-            <div style="background:#f8fafc;padding:10px 12px;border-radius:8px;border:1px solid #e2e8f0;">
-              ${order.items
-                .map(
-                  (i) =>
-                    `<div style="padding:3px 0;">• <strong>${i.name}</strong> × ${i.quantity} — ${
-                      i.price ? `GH₵ ${(i.price * i.quantity).toFixed(2)}` : 'Quote'
-                    }</div>`
-                )
-                .join('')}
-            </div>
-          </div>
-
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <a href="${waLink}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;padding:12px;background:#176B3A;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;">
-              💬 Send Instant WhatsApp Confirmation (${MOMO_CONFIG.momoNumber})
-            </a>
-            <button type="button" onclick="window.print()" style="padding:10px;background:#f1f5f9;color:#0f172a;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
-              🖨️ Print Order Receipt
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('kerd-track-close').addEventListener('click', () => {
-      modal.remove();
-    });
-  }
-
-  // --- CONNECT ALL FORMS TO kerdfarms@gmail.com ---
-  function bindAllFormsOnPage() {
-    document.querySelectorAll('form').forEach((form) => {
-      if (form.id === 'kerd-momo-form' || form.dataset.kerdBound === 'true') return;
-      form.dataset.kerdBound = 'true';
-
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        const payload = {
-          _subject: `📩 New Form Submission (${document.title || 'Kerd Farms'})`,
-          _template: 'table',
-          _captcha: 'false',
-          'Source Page': window.location.pathname,
-        };
-
-        // Gather all input, select, textarea values even if they don't have a name attribute
-        form.querySelectorAll('input, select, textarea').forEach((el, idx) => {
-          const val = (el.value || '').trim();
-          if (!val) return;
-          const labelEl = el.closest('label') || (el.id ? form.querySelector(`label[for="${el.id}"]`) : null) || el.previousElementSibling;
-          const key =
-            el.name ||
-            (labelEl && labelEl.textContent ? labelEl.textContent.trim().replace(/\s+/g, ' ') : '') ||
-            el.placeholder ||
-            el.getAttribute('aria-label') ||
-            `Field_${idx + 1}`;
-          payload[key] = val;
-          if (el.type === 'email') {
-            payload._replyto = val;
-          }
-        });
-
-        const submitBtn = form.querySelector('button[type="submit"], input[type="submit"], button:not([type="button"])');
-        const originalHtml = submitBtn ? submitBtn.innerHTML : '';
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'Sending to kerdfarms@gmail.com...';
-        }
-
-        try {
-          await fetch('https://formsubmit.co/ajax/kerdfarms@gmail.com', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          showToast('Sent! Your submission has been delivered to kerdfarms@gmail.com.');
-          form.reset();
-        } catch (err) {
-          showToast('Submitted to kerdfarms@gmail.com!');
-          form.reset();
-        } finally {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalHtml;
-          }
-        }
-      });
-    });
   }
 
   // --- ADD PRODUCT FROM CARD ---
@@ -930,14 +733,11 @@
     const titleEl = card.querySelector('h3, h2, h4');
     const name = titleEl ? titleEl.textContent.trim() : 'Kerd Farms Product';
 
-    // Look for GH₵ price in card
     const cardText = card.textContent || '';
     const priceMatch = cardText.match(/GH[₵S¢]\s*(\d+(?:\.\d+)?)/i);
     const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
-
     const unitMatch = cardText.match(/\/\s*(kg|piece|crate|sack|bag)/i);
     const unit = unitMatch ? unitMatch[1] : 'unit';
-
     const productId = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
     const cart = getCart();
@@ -948,11 +748,11 @@
       cart.push({ id: productId, name, price, unit, quantity: 1 });
     }
     saveCart(cart);
-    showToast(`Added "${name}" to cart (MoMo: ${MOMO_CONFIG.momoNumber})`);
+    showToast(`Added "${name}" to cart`);
     openCartDrawer(false);
   }
 
-  // --- GLOBAL DELEGATED CLICK HANDLER (MOBILE MENU, CART, PRODUCT ADD, PREFETCH) ---
+  // --- GLOBAL DELEGATED CLICK HANDLER ---
   function initGlobalDelegation() {
     if (window.__kerdDelegationBound) return;
     window.__kerdDelegationBound = true;
@@ -961,16 +761,12 @@
       const target = e.target;
       if (!target || !target.closest) return;
 
-      // 1. Mobile Hamburger Menu Button (3 lines)
-      const menuBtn = target.closest(
-        '#kerd-hamburger-btn, button[aria-label="Open menu"], button[aria-label="Close menu"]'
-      );
+      const menuBtn = target.closest('#kerd-hamburger-btn, button[aria-label="Open menu"], button[aria-label="Close menu"]');
       if (menuBtn) {
         toggleMobileDropdown(e);
         return;
       }
 
-      // 2. Shopping Cart Button in Header
       const cartBtn = target.closest('button[aria-label*="Shopping cart"]');
       if (cartBtn) {
         e.preventDefault();
@@ -978,59 +774,9 @@
         openCartDrawer(false);
         return;
       }
-
-      // 3. Product Card "ADD TO CART" or "ADD TO QUOTE" buttons or "/product/..." links
-      const actionBtn = target.closest('button, a');
-      if (actionBtn) {
-        const txt = (actionBtn.textContent || '').trim().toUpperCase();
-        const href = actionBtn.getAttribute('href') || '';
-        if (txt.includes('ADD TO CART') || txt.includes('ADD TO QUOTE') || href.startsWith('/product/')) {
-          e.preventDefault();
-          addProductFromCardElement(actionBtn);
-          return;
-        }
-      }
-
-      // 4. Close mobile dropdown when clicking outside header
-      const dropdown = document.getElementById('kerd-mobile-dropdown');
-      if (dropdown && dropdown.style.display === 'block') {
-        if (!target.closest('header')) {
-          closeMobileDropdown();
-        }
-      }
     });
-
-    // Instant link prefetching on hover / touchstart for fast navigation
-    const prefetched = new Set();
-    function prefetchUrl(url) {
-      if (!url || prefetched.has(url) || !url.startsWith('/') || url.startsWith('//')) return;
-      prefetched.add(url);
-      const link = document.createElement('link');
-      link.rel = 'prefetch';
-      link.href = url;
-      document.head.appendChild(link);
-    }
-
-    document.addEventListener(
-      'mouseover',
-      (e) => {
-        const a = e.target.closest && e.target.closest('a[href^="/"]');
-        if (a) prefetchUrl(a.getAttribute('href'));
-      },
-      { passive: true }
-    );
-
-    document.addEventListener(
-      'touchstart',
-      (e) => {
-        const a = e.target.closest && e.target.closest('a[href^="/"]');
-        if (a) prefetchUrl(a.getAttribute('href'));
-      },
-      { passive: true }
-    );
   }
 
-  // --- INITIALIZE ALL ---
   function initKerdAll() {
     ensureMobileDropdownCreated();
     initDesktopShopMenu();
@@ -1038,7 +784,6 @@
     initFaqAccordions();
     initShopFiltering();
     updateCartBadges();
-    bindAllFormsOnPage();
     injectCartDrawerModal();
     initGlobalDelegation();
   }
@@ -1048,11 +793,4 @@
   } else {
     initKerdAll();
   }
-
-  window.KerdFarms = {
-    openCart: () => openCartDrawer(false),
-    openCheckout: () => openCartDrawer(true),
-    toggleMobileMenu: toggleMobileDropdown,
-    showToast,
-  };
 })();
