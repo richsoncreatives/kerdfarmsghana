@@ -112,7 +112,7 @@
     }, 3200);
   }
 
-  // --- MOBILE & TABLET DROPDOWN MENU (3-LINES HAMBURGER) ---
+  // --- MOBILE & TABLET DROPDOWN MENU ---
   function ensureMobileDropdownCreated() {
     const header = document.querySelector('header');
     if (!header) return null;
@@ -158,7 +158,6 @@
       font-size: 15px;
       text-decoration: none;
       border-bottom: 1px solid rgba(16, 71, 43, 0.07);
-      transition: background 0.15s ease, color 0.15s ease;
     `;
 
     const subLinkStyle = (active) => `
@@ -172,7 +171,6 @@
       font-size: 13.5px;
       text-decoration: none;
       border-bottom: 1px solid rgba(16, 71, 43, 0.06);
-      transition: background 0.15s ease, color 0.15s ease;
     `;
 
     dropdown.innerHTML = `
@@ -312,29 +310,21 @@
     }
   }
 
-  // --- ROBUST DESKTOP SHOP DROPDOWN MENU FIX ---
+  // --- DESKTOP SHOP DROPDOWN MENU FIX ---
   function initDesktopShopMenu() {
-    // Target all dropdown triggers or buttons containing "Shop" in navigation
     document.querySelectorAll('nav button, nav a, header button, header div').forEach((el) => {
       const text = (el.textContent || '').trim();
-      if (text.startsWith('Shop') || text === 'Shop ▾' || text === 'Shop ▼') {
+      if (text.startsWith('Shop') || text.includes('Shop ▾') || text.includes('Shop ▼')) {
         el.style.cursor = 'pointer';
-        
-        // Find associated dropdown container (next sibling or parent's child menu)
         let dropdownMenu = el.nextElementSibling || el.parentElement.querySelector('div, ul');
         
         el.addEventListener('click', (e) => {
-          // If it's a direct link to /shop/ and not a dropdown opener, let it navigate normally unless it has a submenu
           const hasSubmenu = dropdownMenu && (dropdownMenu.querySelectorAll('a').length > 0 || dropdownMenu.id === 'kerd-shop-menu');
-          
           if (hasSubmenu) {
             e.preventDefault();
             e.stopPropagation();
             const isOpen = dropdownMenu.style.display === 'block';
-            
-            // Close any other open dropdowns first
             document.querySelectorAll('.kerd-desktop-dropdown').forEach(d => d.style.display = 'none');
-            
             dropdownMenu.style.display = isOpen ? 'none' : 'block';
             dropdownMenu.classList.add('kerd-desktop-dropdown');
             dropdownMenu.style.position = 'absolute';
@@ -345,7 +335,6 @@
       }
     });
 
-    // Close desktop dropdown when clicking anywhere else
     document.addEventListener('click', (e) => {
       if (!e.target.closest('nav') && !e.target.closest('header')) {
         document.querySelectorAll('.kerd-desktop-dropdown').forEach(d => d.style.display = 'none');
@@ -353,7 +342,7 @@
     });
   }
 
-  // --- DISMISS TOP ANNOUNCEMENT BANNER ---
+  // --- DISMISS ANNOUNCEMENT BANNER ---
   function initAnnouncementDismiss() {
     document.querySelectorAll('button[aria-label="Dismiss announcement"]').forEach((btn) => {
       btn.onclick = (e) => {
@@ -425,43 +414,6 @@
       searchInput.oninput = (e) => {
         filterCards(e.target.value, 'all');
       };
-    }
-
-    document.querySelectorAll('button').forEach((btn) => {
-      const label = (btn.textContent || '').trim();
-      const upper = label.toUpperCase();
-      if (
-        [
-          'ALL',
-          'POULTRY & EGGS',
-          'FRUITS & VEGETABLES',
-          'MANURE & FERTILIZER',
-          'ALL CATEGORIES',
-          'EGGS',
-          'FRUITS',
-          'VEGETABLES',
-          'MANURE & COMPOST',
-          'FERTILIZERS & INPUTS',
-          'CLEAR ALL FILTERS',
-        ].includes(upper)
-      ) {
-        btn.style.cursor = 'pointer';
-        btn.onclick = (e) => {
-          e.preventDefault();
-          if (upper === 'CLEAR ALL FILTERS') {
-            if (searchInput) searchInput.value = '';
-            filterCards('', 'all');
-          } else {
-            filterCards(searchInput ? searchInput.value : '', label);
-          }
-        };
-      }
-    });
-
-    const params = new URLSearchParams(window.location.search);
-    const urlCat = params.get('category') || params.get('division');
-    if (urlCat) {
-      filterCards('', urlCat);
     }
   }
 
@@ -717,6 +669,35 @@
         };
 
         saveOrder(orderData);
+
+        // Send notification via FormSubmit
+        const itemsListText = cart
+          .map((item, idx) => `${idx + 1}. ${item.name} (Qty: ${item.quantity}) - GH₵ ${((item.price || 0) * item.quantity).toFixed(2)}`)
+          .join('\n');
+
+        const emailPayload = {
+          _subject: `🛍️ NEW MOMO ORDER [${orderId}] - GH₵ ${grandTotal.toFixed(2)} - Kerd Farms`,
+          _replyto: custEmail || MOMO_CONFIG.email,
+          _template: 'table',
+          _captcha: 'false',
+          'Order ID': orderId,
+          'Customer Name': custName,
+          'Customer Phone': custPhone,
+          'Delivery Address': custAddress,
+          'MoMo Sender Name': accName,
+          'MoMo Sender Phone': senderPhone,
+          'Order Items': itemsListText,
+          'TOTAL AMOUNT': `GH₵ ${grandTotal.toFixed(2)}`,
+        };
+
+        try {
+          await fetch('https://formsubmit.co/ajax/kerdfarms@gmail.com', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(emailPayload),
+          });
+        } catch (err) {}
+
         saveCart([]);
         closeCartDrawer();
         showToast(`Order #${orderId} submitted successfully!`);
@@ -752,7 +733,7 @@
     openCartDrawer(false);
   }
 
-  // --- GLOBAL DELEGATED CLICK HANDLER ---
+  // --- GLOBAL DELEGATED CLICK HANDLER (WORKS ON ALL PAGES) ---
   function initGlobalDelegation() {
     if (window.__kerdDelegationBound) return;
     window.__kerdDelegationBound = true;
@@ -773,6 +754,17 @@
         closeMobileDropdown();
         openCartDrawer(false);
         return;
+      }
+
+      // Universal Add to Cart / Order button catcher for all pages
+      const btn = target.closest('button, a');
+      if (btn) {
+        const txt = (btn.textContent || '').trim().toUpperCase();
+        if (txt.includes('ADD TO CART') || txt.includes('ADD TO QUOTE') || txt.includes('ORDER') || txt.includes('BUY NOW')) {
+          e.preventDefault();
+          addProductFromCardElement(btn);
+          return;
+        }
       }
     });
   }
