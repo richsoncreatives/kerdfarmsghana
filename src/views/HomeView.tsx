@@ -321,7 +321,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
               <h3 className="font-bold text-sm text-white">Pay via MoMo</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Transfer total to MTN MoMo <strong>055 123 4567</strong> or Telecel <strong>024 013 5545</strong> (Kerd Farms).
+                Transfer total to MoMo number <strong>024 013 5545</strong> (Kerd Farms).
               </p>
             </div>
 

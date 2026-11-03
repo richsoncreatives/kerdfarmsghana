@@ -120,7 +120,7 @@ export const DeploymentGuideModal: React.FC<DeploymentGuideModalProps> = ({
             <h4 className="font-bold text-slate-900 dark:text-white">Form & Order Handling Summary</h4>
             <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400 text-[11px]">
               <li><strong>Target Email:</strong> All enquiries and MoMo orders are emailed directly to <strong className="text-slate-900 dark:text-white">kerdfarms@gmail.com</strong>.</li>
-              <li><strong>Mobile Money:</strong> Customers pay to MTN 055 123 4567 or Telecel 024 013 5545, then click "I Have Paid & Submit Order".</li>
+              <li><strong>Mobile Money:</strong> Customers pay to MoMo number 024 013 5545 (KERD FARMS), then click "I Have Paid & Submit Order".</li>
               <li><strong>Order ID Tracking:</strong> Orders are stored in local storage and can be tracked using their Order ID (`#KF-XXXXX`).</li>
             </ul>
           </div>

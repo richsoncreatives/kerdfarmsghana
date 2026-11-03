@@ -67,7 +67,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({ onOpenEnquiry }) => {
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
             <div>
               <strong className="block text-slate-900 dark:text-white font-bold mb-0.5">Transparent MoMo Payments</strong>
-              <span>Clear Mobile Money numbers (055 123 4567) displayed at checkout with instant receipt generation.</span>
+              <span>Clear Mobile Money number (024 013 5545) displayed at checkout with instant receipt generation.</span>
             </div>
           </div>
 

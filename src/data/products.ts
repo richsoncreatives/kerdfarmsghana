@@ -442,7 +442,7 @@ export const PRODUCTS: Product[] = [
 
 export const MOMO_CONFIG = {
   accountName: 'KERD FARMS',
-  mtnNumber: '055 123 4567',
+  mtnNumber: '024 013 5545',
   telecelNumber: '024 013 5545',
   airtelTigoNumber: '024 013 5545',
   primaryPhone: '+233 24 013 5545',

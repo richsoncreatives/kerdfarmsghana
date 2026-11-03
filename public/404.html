@@ -1,2 +1,35 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found | Kerd Farms</title><meta http-equiv="refresh" content="3;url=/"><body><p>This page could not be found. <a href="/">Return to Kerd Farms home</a>.</p>  <script src="/kerd-momo-core.js"></script>
+
+<style id="kerd-enhanced-styles">
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    opacity: 1;
+    transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  body.kerd-page-transitioning {
+    opacity: 0.65;
+  }
+  /* Ensure 3-line hamburger menu button is always visible and clickable on mobile & tablet (< 1280px) */
+  @media (max-width: 1279px) {
+    button[aria-label="Open menu"],
+    button[aria-label="Close menu"],
+    #kerd-hamburger-btn {
+      display: inline-flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+  }
+  /* Mobile dropdown panel animation */
+  #kerd-mobile-dropdown {
+    transition: max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, transform 0.22s ease;
+    transform-origin: top center;
+  }
+</style>
+
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found | Kerd Farms</title><meta http-equiv="refresh" content="3;url=/"><body><p>This page could not be found. <a href="/">Return to Kerd Farms home</a>.</p><script src="/kerd-momo-core.js" defer></script>
 </body></html>

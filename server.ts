@@ -42,6 +42,15 @@ app.post('/api/submit-order', (req, res) => {
   });
 });
 
+// Long-term browser caching for extracted media & font assets for ultra-fast page transitions
+app.use(
+  '/assets/media',
+  express.static(path.join(__dirname, 'public', 'assets', 'media'), {
+    maxAge: '365d',
+    immutable: true,
+  })
+);
+
 // EXPLICIT MULTI-PAGE ROUTES (BEFORE VITE MIDDLEWARE)
 const staticRoutes = [
   'shop',
