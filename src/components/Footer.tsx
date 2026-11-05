@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, Phone, Mail, MapPin, ShieldCheck, Heart, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Send, Phone, Mail, MapPin, ShieldCheck, Heart, ArrowRight, CheckCircle2, MessageSquare } from 'lucide-react';
 import { MOMO_CONFIG } from '../data/products';
 import { submitNewsletterToEmail } from '../services/formService';
 
@@ -46,11 +46,11 @@ export const Footer: React.FC<FooterProps> = ({
 
           <div className="flex items-center gap-3 p-3 bg-emerald-950/60 rounded-2xl border border-emerald-800/50">
             <div className="p-3 bg-emerald-800 text-amber-300 rounded-xl font-bold text-lg shrink-0">
-              ✉️
+              💬
             </div>
             <div className="text-xs">
-              <div className="font-bold text-white text-sm">Direct Email Confirmation</div>
-              <div className="text-emerald-200 mt-0.5">All orders & enquiries sent to <strong>{MOMO_CONFIG.email}</strong></div>
+              <div className="font-bold text-white text-sm">Official WhatsApp Line</div>
+              <div className="text-emerald-200 mt-0.5">Chat instantly at <a href="https://wa.me/233240135545?text=Hello%20Kerd%20Farms%2C%20I%20would%20like%20to%20make%20an%20enquiry." target="_blank" rel="noopener noreferrer" className="underline text-amber-300 hover:text-white">+233 24 013 5545</a></div>
             </div>
           </div>
 
@@ -95,8 +95,8 @@ export const Footer: React.FC<FooterProps> = ({
               <span>Email: <strong className="text-white">{MOMO_CONFIG.email}</strong></span>
             </div>
             <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Phone / WhatsApp: <strong className="text-white">{MOMO_CONFIG.primaryPhone}</strong></span>
+              <MessageSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>WhatsApp Line: <a href="https://wa.me/233240135545?text=Hello%20Kerd%20Farms%2C%20I%20need%20support." target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:underline font-bold">+233 24 013 5545</a></span>
             </div>
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -174,7 +174,7 @@ export const Footer: React.FC<FooterProps> = ({
           </ul>
         </div>
 
-        {/* Col 4: Newsletter Subscription to kerdfarms@gmail.com */}
+        {/* Col 4: Newsletter Subscription */}
         <div className="space-y-3">
           <h3 className="text-xs font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2">
             Stay Connected
@@ -186,7 +186,7 @@ export const Footer: React.FC<FooterProps> = ({
           {newsletterSubmitted ? (
             <div className="p-3 bg-emerald-900/50 border border-emerald-700/60 rounded-xl text-emerald-200 text-xs flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-amber-300 shrink-0" />
-              <span>Subscribed! Updates will be routed to {newsletterEmail || 'your email'}.</span>
+              <span>Subscribed! Updates will be routed to your email.</span>
             </div>
           ) : (
             <form onSubmit={handleNewsletterSubmit} className="space-y-2">
@@ -227,7 +227,7 @@ export const Footer: React.FC<FooterProps> = ({
 
       </div>
 
-      {/* Bottom Legal & Copyright Bar */}
+      {/* Bottom Legal & Copyright Bar (Preserved exactly as requested) */}
       <div className="border-t border-slate-900 bg-slate-950 px-4 py-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-center sm:text-left">
           <div>
