@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Send, AlertCircle, Building, MessageSquare } from 'lucide-react';
+import { X, AlertCircle, Building, MessageSquare } from 'lucide-react';
 
 interface EnquiryModalProps {
   isOpen: boolean;
