@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { X, Send, CheckCircle, AlertCircle, Building, MessageSquare } from 'lucide-react';
-import { getWhatsAppEnquiryLink } from '../services/formService';
+import { X, Send, AlertCircle, Building, MessageSquare } from 'lucide-react';
 
 interface EnquiryModalProps {
   isOpen: boolean;
@@ -46,22 +45,22 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
 
     setIsSubmitting(true);
 
-    // Construct the enquiry submission data object
-    const enquiryData = {
-      enquiryType,
-      fullName: fullName.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      organization: organization.trim(),
-      location: location.trim(),
-      message: message.trim(),
-      submittedAt: new Date().toISOString()
-    };
+    // Build formatted WhatsApp message text
+    const text = 
+`Hello Kerd Farms, I would like to submit an enquiry.
 
-    // Generate the direct WhatsApp link pointing to your official number (https://wa.me/233240135545)
-    const whatsappUrl = getWhatsAppEnquiryLink(enquiryData);
+*Request Type:* ${enquiryType}
+*Full Name:* ${fullName.trim()}
+*Phone Number:* ${phone.trim()}
+*Email:* ${email.trim() || 'Not specified'}
+*Organization:* ${organization.trim() || 'N/A'}
+*Location:* ${location.trim() || 'Not specified'}
 
-    // Open WhatsApp in a new tab
+*Message:*
+${message.trim()}`;
+
+    // Open official WhatsApp line (+233 24 013 5545)
+    const whatsappUrl = `https://wa.me/233240135545?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
 
     setIsSubmitting(false);
