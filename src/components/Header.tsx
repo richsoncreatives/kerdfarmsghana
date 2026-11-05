@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Phone, Menu, X, CheckCircle, Search, ShieldCheck, HelpCircle } from 'lucide-react';
+import { ShoppingBag, Phone, Menu, X, CheckCircle, Search, ShieldCheck, HelpCircle, MessageSquare } from 'lucide-react';
 import { MOMO_CONFIG } from '../data/products';
 
 interface HeaderProps {
@@ -60,12 +60,13 @@ export const Header: React.FC<HeaderProps> = ({
               GitHub & Cloudflare Pages Ready
             </button>
             <a
-              href={`https://wa.me/${MOMO_CONFIG.whatsappNumber}`}
+              href="https://wa.me/233240135545?text=Hello%20Kerd%20Farms%2C%20I%20would%20like%20to%20make%20an%20enquiry."
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline hidden sm:inline-block font-semibold text-amber-300"
+              className="hover:underline hidden sm:inline-flex items-center gap-1 font-semibold text-amber-300"
             >
-              WhatsApp: {MOMO_CONFIG.primaryPhone}
+              <MessageSquare className="w-3.5 h-3.5" />
+              WhatsApp: +233 24 013 5545
             </a>
           </div>
         </div>
@@ -120,13 +121,28 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* ZONE 3: Primary Action & Mobile Menu Toggle */}
           <div className="flex items-center gap-3 shrink-0">
-            {/* Quick MoMo Info Pill */}
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span className="text-emerald-900 dark:text-emerald-200 font-medium">
-                MoMo: <span className="font-bold">{MOMO_CONFIG.mtnNumber}</span>
-              </span>
-            </div>
+            
+            {/* Search Button (Fixed to open Shop / Search view) */}
+            <button
+              onClick={() => handleNavClick('shop')}
+              className="p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              title="Search Products"
+              aria-label="Search Products"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {/* Direct WhatsApp Chat Icon Button */}
+            <a
+              href="https://wa.me/233240135545?text=Hello%20Kerd%20Farms%2C%20I%20would%20like%20to%20place%20an%20order%20or%20make%20an%20enquiry."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition-colors"
+              title="Chat on WhatsApp (+233 24 013 5545)"
+              aria-label="Chat on WhatsApp"
+            >
+              <MessageSquare className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            </a>
 
             {/* Cart Button */}
             <button
@@ -176,13 +192,11 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="pt-3 space-y-3">
             <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200/80 dark:border-amber-800/40 text-xs text-amber-900 dark:text-amber-200 space-y-1">
               <div className="font-bold flex items-center gap-1">
-                <span>📱 Mobile Money Payment Info</span>
+                <span>📱 Official WhatsApp & MoMo Line</span>
               </div>
+              <div>WhatsApp: <a href="https://wa.me/233240135545" target="_blank" rel="noreferrer" className="underline font-bold">+233 24 013 5545</a></div>
               <div>MTN MoMo: <strong>{MOMO_CONFIG.mtnNumber}</strong></div>
               <div>Telecel Cash: <strong>{MOMO_CONFIG.telecelNumber}</strong></div>
-              <div className="text-[11px] text-amber-800 dark:text-amber-300">
-                Account Name: <strong>{MOMO_CONFIG.accountName}</strong>
-              </div>
             </div>
 
             <div className="flex gap-2">
@@ -196,16 +210,15 @@ export const Header: React.FC<HeaderProps> = ({
                 <ShoppingBag className="w-4 h-4" />
                 View Cart ({cartCount})
               </button>
-              <button
-                onClick={() => {
-                  onOpenDeployGuide();
-                  setMobileMenuOpen(false);
-                }}
-                className="px-3 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl font-medium text-xs flex items-center justify-center gap-1"
+              <a
+                href="https://wa.me/233240135545?text=Hello%20Kerd%20Farms%2C%20I%20need%20assistance."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-2.5 bg-emerald-600 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5"
               >
-                <HelpCircle className="w-4 h-4" />
-                Deploy
-              </button>
+                <MessageSquare className="w-4 h-4" />
+                WhatsApp
+              </a>
             </div>
           </div>
         </div>
