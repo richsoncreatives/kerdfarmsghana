@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trash2, Plus, Minus, CreditCard, Send, CheckCircle2, ArrowRight, ShieldCheck, AlertCircle, Copy, Check, MessageSquare } from 'lucide-react';
-import { CartItem, OrderSubmission, generateOrderId, submitOrderToEmail, getWhatsAppOrderLink } from '../services/formService';
+import { CartItem, OrderSubmission, generateOrderId, getWhatsAppOrderLink } from '../services/formService';
 import { MOMO_CONFIG } from '../data/products';
 
 interface CartDrawerProps {
@@ -22,7 +22,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onClearCart,
   onOrderCompleted,
 }) => {
-  const [checkoutStep, setCheckoutStep] = useState<'cart' | 'momo_payment' | 'submitting'>('cart');
+  const [checkoutStep, setCheckoutStep] = useState<'cart' | 'momo_payment'>('cart');
   const [orderId, setOrderId] = useState<string>('');
   
   // Form fields
@@ -39,7 +39,6 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const [momoTransactionId, setMomoTransactionId] = useState('');
   
   const [copiedMoMo, setCopiedMoMo] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
 
   // Generate Order ID when checkout starts
@@ -65,7 +64,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     setTimeout(() => setCopiedMoMo(false), 2500);
   };
 
-  const handlePaidSubmit = async (e: React.FormEvent) => {
+  const handleWhatsAppCheckout = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
 
@@ -81,13 +80,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       setFormError('Please enter your delivery address/location');
       return;
     }
-    if (!momoAccountName.trim() || !momoPhone.trim()) {
-      setFormError('Please provide your MoMo Account Name and MoMo Sender Phone Number');
-      return;
-    }
 
-    setIsSubmitting(true);
-
+    // Construct the complete order object
     const newOrder: OrderSubmission = {
       orderId: orderId || generateOrderId(),
       createdAt: new Date().toISOString(),
@@ -104,25 +98,21 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       subtotal,
       deliveryFee,
       totalAmount: grandTotal,
-      paymentStatus: 'Paid & Pending Verification'
+      paymentStatus: momoTransactionId.trim() ? 'Paid & Pending Verification' : 'Order Placed (Pay on Delivery / Pending MoMo)'
     };
 
-    const res = await submitOrderToEmail(newOrder);
-    setIsSubmitting(false);
+    // Generate the WhatsApp URL with the full cart summary and customer details
+    const whatsappUrl = getWhatsAppOrderLink(newOrder);
 
-    if (res.success) {
-      onClearCart();
-      onOrderCompleted(newOrder);
-      onClose();
-      // Reset state
-      setCheckoutStep('cart');
-      setOrderId('');
-    } else {
-      setFormError('Could not auto-send email. Proceeding to order confirmation.');
-      onClearCart();
-      onOrderCompleted(newOrder);
-      onClose();
-    }
+    // Open WhatsApp in a new tab pointing to your official number (https://wa.me/233240135545)
+    window.open(whatsappUrl, '_blank');
+
+    // Complete order actions
+    onClearCart();
+    onOrderCompleted(newOrder);
+    onClose();
+    setCheckoutStep('cart');
+    setOrderId('');
   };
 
   return (
@@ -141,7 +131,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             <div className="flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-amber-300" />
               <h2 className="text-lg font-bold">
-                {checkoutStep === 'cart' ? 'Your Shopping Cart' : 'MoMo Payment & Checkout'}
+                {checkoutStep === 'cart' ? 'Your Shopping Cart' : 'WhatsApp Checkout & Payment'}
               </h2>
             </div>
             <button
@@ -178,17 +168,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </div>
                 ) : (
                   <>
-                    {/* Always visible MoMo Highlight Banner */}
-                    <div className="p-3.5 bg-amber-50 dark:bg-amber-950/50 rounded-xl border border-amber-200/80 dark:border-amber-800/60 flex items-start gap-3">
-                      <div className="p-2 bg-amber-400 text-emerald-950 rounded-lg font-black text-xs shrink-0">
-                        MoMo
+                    {/* WhatsApp Highlight Banner */}
+                    <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl border border-emerald-200/80 dark:border-emerald-800/60 flex items-start gap-3">
+                      <div className="p-2 bg-emerald-600 text-white rounded-lg shrink-0">
+                        <MessageSquare className="w-4 h-4" />
                       </div>
-                      <div className="text-xs text-amber-900 dark:text-amber-200 space-y-1">
-                        <div className="font-bold">Mobile Money Payment Available</div>
-                        <div>MTN / Telecel MoMo: <strong>{MOMO_CONFIG.mtnNumber}</strong></div>
-                        <div className="text-[11px] text-amber-800 dark:text-amber-300">
-                          Transfer total on checkout, then click "I Have Paid" to submit your order to <strong>{MOMO_CONFIG.email}</strong>.
-                        </div>
+                      <div className="text-xs text-emerald-900 dark:text-emerald-200 space-y-1">
+                        <div className="font-bold">Instant WhatsApp Checkout</div>
+                        <div>Send your entire cart summary directly to our official line: <strong>+233 24 013 5545</strong></div>
                       </div>
                     </div>
 
@@ -252,11 +239,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               </>
             )}
 
-            {/* STEP 2: MOMO PAYMENT & ORDER SUBMISSION FORM */}
+            {/* STEP 2: DETAILS & MOMO CONFIRMATION FOR WHATSAPP */}
             {checkoutStep === 'momo_payment' && (
-              <form id="momo-checkout-form" onSubmit={handlePaidSubmit} className="space-y-5">
+              <form id="whatsapp-checkout-form" onSubmit={handleWhatsAppCheckout} className="space-y-5">
                 
-                {/* PROMINENT MOMO PAYMENT DETAILS CARD */}
+                {/* MOMO DETAILS CARD */}
                 <div className="p-4 bg-gradient-to-br from-emerald-900 via-emerald-800 to-slate-900 text-white rounded-2xl shadow-md border border-emerald-700/50 space-y-3">
                   <div className="flex items-center justify-between border-b border-emerald-700/60 pb-2.5">
                     <div className="flex items-center gap-2">
@@ -264,7 +251,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         MOMO PAYMENT
                       </span>
                       <span className="text-xs font-semibold text-emerald-200">
-                        Order Ref: <strong className="text-white">{orderId}</strong>
+                        Ref: <strong className="text-white">{orderId}</strong>
                       </span>
                     </div>
                     <span className="text-xs bg-emerald-700/80 px-2 py-0.5 rounded text-emerald-100 font-mono">
@@ -272,39 +259,27 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
-                    <div className="bg-emerald-950/60 p-2.5 rounded-xl border border-emerald-800/80">
-                      <div className="text-[10px] text-emerald-300 uppercase tracking-wider font-bold">MTN Mobile Money</div>
-                      <div className="text-sm font-extrabold font-mono text-amber-300 mt-0.5 flex items-center justify-between">
-                        <span>{MOMO_CONFIG.mtnNumber}</span>
-                        <button
-                          type="button"
-                          onClick={handleCopyMoMo}
-                          className="p-1 text-emerald-300 hover:text-white"
-                          title="Copy MoMo Number"
-                        >
-                          {copiedMoMo ? <Check className="w-3.5 h-3.5 text-amber-300" /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                      <div className="text-[10px] text-emerald-300">Name: {MOMO_CONFIG.accountName}</div>
+                  <div className="bg-emerald-950/60 p-2.5 rounded-xl border border-emerald-800/80">
+                    <div className="text-[10px] text-emerald-300 uppercase tracking-wider font-bold">Official MoMo Number</div>
+                    <div className="text-sm font-extrabold font-mono text-amber-300 mt-0.5 flex items-center justify-between">
+                      <span>{MOMO_CONFIG.mtnNumber}</span>
+                      <button
+                        type="button"
+                        onClick={handleCopyMoMo}
+                        className="p-1 text-emerald-300 hover:text-white"
+                        title="Copy MoMo Number"
+                      >
+                        {copiedMoMo ? <Check className="w-3.5 h-3.5 text-amber-300" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
                     </div>
-
-                    <div className="bg-emerald-950/60 p-2.5 rounded-xl border border-emerald-800/80">
-                      <div className="text-[10px] text-emerald-300 uppercase tracking-wider font-bold">Telecel / AirtelTigo</div>
-                      <div className="text-sm font-extrabold font-mono text-amber-300 mt-0.5">
-                        {MOMO_CONFIG.telecelNumber}
-                      </div>
-                      <div className="text-[10px] text-emerald-300">Name: {MOMO_CONFIG.accountName}</div>
-                    </div>
+                    <div className="text-[10px] text-emerald-300">Name: {MOMO_CONFIG.accountName}</div>
                   </div>
 
                   <div className="text-[11px] text-emerald-200 bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-800/50 space-y-1">
-                    <div className="font-bold text-amber-300">Quick MoMo Instructions:</div>
+                    <div className="font-bold text-amber-300">Instructions:</div>
                     <ol className="list-decimal list-inside space-y-0.5">
-                      <li>Dial *170# (MTN) or *110# (Telecel)</li>
-                      <li>Transfer <strong>GH₵ {grandTotal.toFixed(2)}</strong> to {MOMO_CONFIG.mtnNumber}</li>
-                      <li>Use Reference: <strong>{orderId}</strong></li>
-                      <li>Fill out payment confirmation below and click <strong>"I Have Paid & Submit Order"</strong></li>
+                      <li>Transfer <strong>GH₵ {grandTotal.toFixed(2)}</strong> via MoMo (Optional if paying on delivery)</li>
+                      <li>Fill your details below and click <strong>"Send Order via WhatsApp"</strong></li>
                     </ol>
                   </div>
                 </div>
@@ -354,21 +329,6 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                          Email (Recommended)
-                        </label>
-                        <input
-                          type="email"
-                          value={customerEmail}
-                          onChange={(e) => setCustomerEmail(e.target.value)}
-                          placeholder="yourname@gmail.com"
-                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
                           City / Region *
                         </label>
                         <select
@@ -381,91 +341,39 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           <option value="Kumasi">Kumasi (GH₵ 35 Delivery)</option>
                           <option value="Takoradi">Takoradi (GH₵ 35 Delivery)</option>
                           <option value="Ho">Ho / Volta Region (GH₵ 30 Delivery)</option>
-                          <option value="Cape Coast">Cape Coast (GH₵ 35 Delivery)</option>
-                          <option value="Tamale">Tamale (GH₵ 40 Delivery)</option>
-                          <option value="Other Ghana Location">Other Region in Ghana (GH₵ 35)</option>
+                          <option value="Other Ghana Location">Other Region (GH₵ 35)</option>
                         </select>
                       </div>
-
-                      <div>
-                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                          Address / Landmark *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={deliveryAddress}
-                          onChange={(e) => setDeliveryAddress(e.target.value)}
-                          placeholder="e.g. East Legon, near Shell"
-                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                        />
-                      </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* PAYMENT PROOF CONFIRMATION */}
-                <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center justify-between">
-                    <span>2. MoMo Payment Confirmation</span>
-                    <span className="text-[10px] text-emerald-600 font-normal">Sent to kerdfarms@gmail.com</span>
-                  </h3>
-
-                  <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                        MoMo Account Name *
+                        Delivery Address / Landmark *
                       </label>
                       <input
                         type="text"
                         required
-                        value={momoAccountName}
-                        onChange={(e) => setMomoAccountName(e.target.value)}
-                        placeholder="Name on your MoMo"
-                        className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                        MoMo Sender Phone *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        value={momoPhone}
-                        onChange={(e) => setMomoPhone(e.target.value)}
-                        placeholder="Number used to send"
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        placeholder="e.g. East Legon, near Shell"
                         className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                       />
                     </div>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      MoMo Transaction ID / Reference
-                    </label>
-                    <input
-                      type="text"
-                      value={momoTransactionId}
-                      onChange={(e) => setMomoTransactionId(e.target.value)}
-                      placeholder="e.g. 28941029412 or Reference #KF-XXXX"
-                      className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      Special Delivery Notes (Optional)
-                    </label>
-                    <textarea
-                      rows={2}
-                      value={specialNotes}
-                      onChange={(e) => setSpecialNotes(e.target.value)}
-                      placeholder="e.g., Deliver before 2pm or call on arrival"
-                      className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                    />
-                  </div>
+                {/* OPTIONAL MOMO TRANSACTION ID */}
+                <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                    2. MoMo Transaction ID (If Paid)
+                  </h3>
+                  <input
+                    type="text"
+                    value={momoTransactionId}
+                    onChange={(e) => setMomoTransactionId(e.target.value)}
+                    placeholder="e.g. 28941029412 (leave blank if paying on delivery)"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  />
                 </div>
 
               </form>
@@ -499,7 +407,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   onClick={() => setCheckoutStep('momo_payment')}
                   className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-sm shadow flex items-center justify-center gap-2 transition-colors"
                 >
-                  <span>Proceed to MoMo Payment</span>
+                  <span>Proceed to WhatsApp Checkout</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
@@ -509,31 +417,21 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     onClick={() => setCheckoutStep('cart')}
                     className="px-4 py-3 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-semibold text-xs transition-colors"
                   >
-                    Back to Cart
+                    Back
                   </button>
                   <button
                     type="submit"
-                    form="momo-checkout-form"
-                    disabled={isSubmitting}
-                    className="flex-1 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-sm shadow flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                    form="whatsapp-checkout-form"
+                    className="flex-1 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-sm shadow flex items-center justify-center gap-2 transition-all"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Sending to kerdfarms@gmail.com...</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="w-4 h-4 text-amber-300" />
-                        <span>I Have Paid & Submit Order</span>
-                      </>
-                    )}
+                    <MessageSquare className="w-4 h-4 text-amber-300" />
+                    <span>Send Order via WhatsApp</span>
                   </button>
                 </div>
               )}
 
               <div className="text-[11px] text-center text-slate-500">
-                🔒 Orders & Payment Proofs automatically dispatched to <strong>kerdfarms@gmail.com</strong> for manual verification.
+                💬 Opens WhatsApp with your complete cart summary sent to <strong>+233 24 013 5545</strong>.
               </div>
 
             </div>
