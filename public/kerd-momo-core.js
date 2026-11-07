@@ -419,6 +419,170 @@
     }
   }
 
+  // --- INSIGHTS TOPIC CATEGORY FILTERING ---
+  function initInsightsFiltering() {
+    const filterButtons = Array.from(document.querySelectorAll('button')).filter((b) => {
+      const text = (b.textContent || '').trim().toUpperCase();
+      return (
+        text === 'ALL TOPICS' ||
+        text === 'POULTRY FARMING' ||
+        text === 'EGG PRODUCTION AND MARKETING' ||
+        text === 'FRUITS AND VEGETABLES' ||
+        text === 'GHANAIAN AGRICULTURAL MARKETS' ||
+        text === 'AFRICAN AGRIBUSINESS' ||
+        text === 'MANURE, COMPOST AND FERTILIZERS' ||
+        text === 'SOIL HEALTH AND SUSTAINABLE FARMING' ||
+        text === 'AGRICULTURAL DISTRIBUTION AND LOGISTICS' ||
+        text === 'CHILD NUTRITION AND FOOD EDUCATION'
+      );
+    });
+
+    if (filterButtons.length === 0) return;
+
+    const articleCards = Array.from(document.querySelectorAll('article.group, .mt-12 article, .mt-16 article'));
+    const searchInput = document.querySelector('input[placeholder*="Search articles"]');
+
+    let currentCategory = 'ALL TOPICS';
+    let currentSearch = '';
+
+    function applyFilter() {
+      const cat = currentCategory.toUpperCase();
+      const q = currentSearch.toLowerCase();
+
+      articleCards.forEach((card) => {
+        const text = (card.textContent || '').toLowerCase();
+        let matchesCategory = false;
+
+        if (cat === 'ALL TOPICS') {
+          matchesCategory = true;
+        } else if (cat === 'POULTRY FARMING') {
+          matchesCategory = text.includes('poultry') || text.includes('egg');
+        } else if (cat === 'EGG PRODUCTION AND MARKETING') {
+          matchesCategory = text.includes('egg') || text.includes('poultry') || text.includes('market');
+        } else if (cat === 'FRUITS AND VEGETABLES') {
+          matchesCategory = text.includes('fruit') || text.includes('vegetable') || text.includes('produce') || text.includes('post-harvest');
+        } else if (cat === 'GHANAIAN AGRICULTURAL MARKETS') {
+          matchesCategory = text.includes('ghana') || text.includes('market') || text.includes('producer') || text.includes('poultry');
+        } else if (cat === 'AFRICAN AGRIBUSINESS') {
+          matchesCategory = text.includes('agribusiness') || text.includes('africa') || text.includes('ghana') || text.includes('development');
+        } else if (cat === 'MANURE, COMPOST AND FERTILIZERS') {
+          matchesCategory = text.includes('manure') || text.includes('compost') || text.includes('fertilizer') || text.includes('soil');
+        } else if (cat === 'SOIL HEALTH AND SUSTAINABLE FARMING') {
+          matchesCategory = text.includes('soil') || text.includes('manure') || text.includes('compost') || text.includes('sustainable');
+        } else if (cat === 'AGRICULTURAL DISTRIBUTION AND LOGISTICS') {
+          matchesCategory = text.includes('distribution') || text.includes('logistics') || text.includes('post-harvest') || text.includes('transport');
+        } else if (cat === 'CHILD NUTRITION AND FOOD EDUCATION') {
+          matchesCategory = text.includes('child') || text.includes('nutrition') || text.includes('stunting') || text.includes('food');
+        } else {
+          matchesCategory = text.includes(cat.toLowerCase());
+        }
+
+        const matchesQuery = !q || text.includes(q);
+        const shouldShow = matchesCategory && matchesQuery;
+
+        const container = card.closest('div[style*="opacity"], .group') || card;
+        container.style.display = shouldShow ? '' : 'none';
+      });
+
+      // Update button visual styles
+      filterButtons.forEach((btn) => {
+        const btnText = (btn.textContent || '').trim().toUpperCase();
+        if (btnText === cat) {
+          btn.className = 'px-4 py-2.5 text-[0.65rem] font-semibold tracking-[0.12em] transition bg-primary text-white';
+          btn.style.backgroundColor = '#176B3A';
+          btn.style.color = '#ffffff';
+          btn.style.borderColor = '#176B3A';
+        } else {
+          btn.className = 'px-4 py-2.5 text-[0.65rem] font-semibold tracking-[0.12em] transition border border-primary/15 text-ink/70 hover:border-primary/40';
+          btn.style.backgroundColor = 'transparent';
+          btn.style.color = '';
+          btn.style.borderColor = '';
+        }
+      });
+    }
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentCategory = (btn.textContent || '').trim().toUpperCase();
+        applyFilter();
+      });
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value.trim();
+        applyFilter();
+      });
+    }
+  }
+
+  // --- IMPACT PAGE NUMBER COUNTERS (150.2, 42.8, 466, 673, 17%) ---
+  function initImpactNumberCounters() {
+    const numberSpans = Array.from(document.querySelectorAll('.font-display')).filter((el) => {
+      const text = (el.textContent || '').trim();
+      return (
+        text === '150.2' ||
+        text === '42.8' ||
+        text === '466' ||
+        text === '673' ||
+        text === '17%'
+      );
+    });
+
+    if (numberSpans.length === 0) return;
+
+    function easeOutExpo(x) {
+      return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+    }
+
+    function animateNumber(element, targetNum, decimals, suffix, duration = 2000) {
+      let startTime = null;
+      element.textContent = '0' + (decimals > 0 ? '.' + '0'.repeat(decimals) : '') + suffix;
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        const eased = easeOutExpo(progress);
+        const current = targetNum * eased;
+        element.textContent = current.toFixed(decimals) + suffix;
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          element.textContent = targetNum.toFixed(decimals) + suffix;
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const el = entry.target;
+              observer.unobserve(el);
+              const text = (el.textContent || '').trim();
+              const hasPercent = text.includes('%');
+              const rawNumber = parseFloat(text.replace('%', ''));
+              const decimals = text.includes('.') ? 1 : 0;
+              const suffix = hasPercent ? '%' : '';
+
+              if (!isNaN(rawNumber)) {
+                animateNumber(el, rawNumber, decimals, suffix, 2000);
+              }
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+
+      numberSpans.forEach((span) => observer.observe(span));
+    }
+  }
+
   // --- CART & MOMO PAYMENT DRAWER ---
   function injectCartDrawerModal() {
     if (document.getElementById('kerd-cart-drawer')) return;
@@ -844,6 +1008,8 @@ Please confirm product availability, delivery scheduling, and final arrangements
     initAnnouncementDismiss();
     initFaqAccordions();
     initShopFiltering();
+    initInsightsFiltering();
+    initImpactNumberCounters();
     updateCartBadges();
     injectCartDrawerModal();
     initGlobalDelegation();
