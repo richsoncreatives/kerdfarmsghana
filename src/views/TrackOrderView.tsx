@@ -103,7 +103,7 @@ export const TrackOrderView: React.FC<TrackOrderViewProps> = ({ initialOrderId =
                 Order ID: <strong className="text-emerald-950 dark:text-white font-mono text-sm">{activeOrder.orderId}</strong>
               </div>
               <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
-                Submitted to kerdfarms@gmail.com on {new Date(activeOrder.createdAt).toLocaleString('en-GB')}
+                Submitted to info@kerdfarms.com &amp; kerdfarms@gmail.com on {new Date(activeOrder.createdAt).toLocaleString('en-GB')}
               </div>
             </div>
             <div className="flex items-center gap-1.5 bg-amber-400 text-emerald-950 px-3 py-1 rounded-full text-xs font-bold shadow-sm">

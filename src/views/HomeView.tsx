@@ -300,7 +300,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               How Ordering Works at Kerd Farms
             </h2>
             <p className="text-xs text-slate-300">
-              Designed for ease of access in Ghana via Mobile Money (MoMo) and automated email confirmation to kerdfarms@gmail.com.
+              Designed for ease of access in Ghana via Mobile Money (MoMo) and automated order routing to info@kerdfarms.com and kerdfarms@gmail.com.
             </p>
           </div>
 
@@ -321,7 +321,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
               <h3 className="font-bold text-sm text-white">Pay via MoMo</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Transfer total to MoMo number <strong>024 013 5545</strong> (Kerd Farms).
+                Transfer total to MoMo number <strong>024 013 5545</strong> (Account: <strong>DANIEL KERDMOTT ESSIEN</strong>).
               </p>
             </div>
 
@@ -329,9 +329,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="w-8 h-8 rounded-xl bg-emerald-800 text-amber-300 flex items-center justify-center font-bold text-sm">
                 3
               </div>
-              <h3 className="font-bold text-sm text-white">Click "I Have Paid"</h3>
+              <h3 className="font-bold text-sm text-white">Confirm via WhatsApp</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Enter your MoMo Sender Name & Tx ID, then click submit to send the form directly to <strong>kerdfarms@gmail.com</strong>.
+                Click "Confirm &amp; Send Order via WhatsApp" for instant summary transmission with verification sent to <strong>info@kerdfarms.com</strong>.
               </p>
             </div>
 
@@ -409,7 +409,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           Ready to Order or Request Wholesale Supply?
         </h2>
         <p className="text-xs sm:text-sm text-emerald-100 max-w-xl mx-auto leading-relaxed">
-          Talk to our team today for eggs by the crate, fresh produce deliveries, or organic manure. We route every request directly to kerdfarms@gmail.com.
+          Talk to our team today for eggs by the crate, fresh produce deliveries, or organic manure. We route every request directly to info@kerdfarms.com and kerdfarms@gmail.com.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button

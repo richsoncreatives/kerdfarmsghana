@@ -15,13 +15,13 @@ app.use(express.json());
 app.post('/api/submit-form', (req, res) => {
   const enquiry = req.body;
   console.log('--------------------------------------------------');
-  console.log(`[KERD FARMS SERVER API] New Enquiry received for kerdfarms@gmail.com:`);
+  console.log(`[KERD FARMS SERVER API] New Enquiry received for info@kerdfarms.com & kerdfarms@gmail.com:`);
   console.log(JSON.stringify(enquiry, null, 2));
   console.log('--------------------------------------------------');
   
   res.json({
     success: true,
-    message: 'Enquiry received and routed to kerdfarms@gmail.com'
+    message: 'Enquiry received and routed to info@kerdfarms.com'
   });
 });
 
@@ -29,7 +29,7 @@ app.post('/api/submit-form', (req, res) => {
 app.post('/api/submit-order', (req, res) => {
   const order = req.body;
   console.log('--------------------------------------------------');
-  console.log(`[KERD FARMS SERVER API] New Order [${order.orderId}] received for kerdfarms@gmail.com:`);
+  console.log(`[KERD FARMS SERVER API] New Order [${order.orderId}] received for info@kerdfarms.com & kerdfarms@gmail.com:`);
   console.log(`Customer: ${order.customerName} (${order.customerPhone})`);
   console.log(`MoMo Sender: ${order.momoAccountName} (${order.momoPhone})`);
   console.log(`Total: GH₵ ${order.totalAmount}`);
@@ -38,7 +38,7 @@ app.post('/api/submit-order', (req, res) => {
   res.json({
     success: true,
     orderId: order.orderId,
-    message: `Order #${order.orderId} received and sent to kerdfarms@gmail.com for MoMo confirmation!`
+    message: `Order #${order.orderId} received and sent to info@kerdfarms.com for MoMo confirmation!`
   });
 });
 

@@ -6,10 +6,12 @@
 
 (function () {
   const MOMO_CONFIG = {
-    accountName: 'KERD FARMS',
+    accountName: 'DANIEL KERDMOTT ESSIEN',
+    businessName: 'KERD FARMS',
     momoNumber: '024 013 5545',
     primaryPhone: '+233 24 013 5545',
-    email: 'kerdfarms@gmail.com',
+    email: 'info@kerdfarms.com',
+    secondaryEmail: 'kerdfarms@gmail.com',
     whatsappNumber: '233240135545',
   };
 
@@ -535,8 +537,11 @@
           <span>Total Payable</span>
           <span style="font-family:monospace;color:#176B3A;">GH₵ ${grandTotal.toFixed(2)}</span>
         </div>
-        <button type="button" id="kerd-goto-momo-btn" style="width:100%;padding:13px;background:#176B3A;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:13.5px;cursor:pointer;">
-          Proceed to MoMo Payment &amp; Confirm →
+        <button type="button" id="kerd-send-wa-cart-btn" style="width:100%;padding:14px;background:#176B3A;color:#fff;border:none;border-radius:10px;font-weight:800;font-size:13.5px;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(23,107,58,0.35);">
+          <span>Confirm &amp; Send Order via WhatsApp</span>
+        </button>
+        <button type="button" id="kerd-goto-momo-btn" style="width:100%;padding:10px;background:#f8fafc;color:#1e293b;border:1px solid #cbd5e1;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;">
+          Enter MoMo Transaction ID &amp; Address →
         </button>
       `;
 
@@ -565,6 +570,63 @@
           renderCartContent('cart');
         });
       });
+
+      const waBtn = document.getElementById('kerd-send-wa-cart-btn');
+      if (waBtn) {
+        waBtn.addEventListener('click', () => {
+          const currentCart = getCart();
+          if (currentCart.length === 0) return;
+          const orderId = generateOrderId();
+          const itemLines = currentCart
+            .map(
+              (i, idx) =>
+                `${idx + 1}. *${i.name}* (${i.unit || 'Standard Pack'})\n   • Qty: ${i.quantity} | Price: GH₵ ${Number(i.price || 0).toFixed(2)} | Total: GH₵ ${(Number(i.price || 0) * i.quantity).toFixed(2)}`
+            )
+            .join('\n\n');
+
+          const messageText = 
+`Hello Kerd Farms (+233 24 013 5545), I would like to place an order from kerdfarms.com.
+
+*Order Reference:* ${orderId}
+
+*--- ORDERED PRODUCTS ---*
+${itemLines}
+
+*--- ORDER TOTALS (GH₵) ---*
+• Items Subtotal: GH₵ ${subtotal.toFixed(2)}
+• Estimated Delivery Fee: GH₵ ${deliveryFee.toFixed(2)}
+• *TOTAL AMOUNT PAYABLE: GH₵ ${grandTotal.toFixed(2)}*
+
+*--- MOBILE MONEY (MoMo) PAYMENT DETAILS ---*
+• MoMo Account Name: ${MOMO_CONFIG.accountName}
+• Official MoMo Number: ${MOMO_CONFIG.momoNumber}
+• Payment Status: Ready for verification upon order review
+
+Please confirm product availability, delivery scheduling, and final arrangements. Thank you!`;
+
+          window.open('https://wa.me/233240135545?text=' + encodeURIComponent(messageText), '_blank');
+
+          saveOrder({
+            orderId,
+            createdAt: new Date().toISOString(),
+            customerName: 'WhatsApp Order',
+            customerPhone: '',
+            customerEmail: 'info@kerdfarms.com',
+            deliveryAddress: 'To be confirmed on WhatsApp',
+            momoAccountName: MOMO_CONFIG.accountName,
+            momoPhone: MOMO_CONFIG.momoNumber,
+            items: currentCart,
+            subtotal,
+            deliveryFee,
+            totalAmount: grandTotal,
+            paymentStatus: 'Submitted via WhatsApp (Pending Confirmation)',
+          });
+
+          saveCart([]);
+          closeCartDrawer();
+          showToast('Order summary opened in WhatsApp!');
+        });
+      }
 
       document.getElementById('kerd-goto-momo-btn').addEventListener('click', () => {
         renderCartContent('momo');
@@ -691,10 +753,17 @@
         };
 
         try {
-          await fetch('https://formsubmit.co/ajax/kerdfarms@gmail.com', {
+          await fetch('https://formsubmit.co/ajax/info@kerdfarms.com', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify(emailPayload),
+          });
+        } catch (err) {}
+        try {
+          await fetch('/api/submit-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData),
           });
         } catch (err) {}
 

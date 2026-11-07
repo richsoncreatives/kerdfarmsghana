@@ -40,7 +40,7 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
             <div className="text-xs">
               <div className="font-bold text-white text-sm">Mobile Money (MoMo) Accepted</div>
-              <div className="text-emerald-200 mt-0.5">MTN: <strong>{MOMO_CONFIG.mtnNumber}</strong> | Telecel: <strong>{MOMO_CONFIG.telecelNumber}</strong></div>
+              <div className="text-emerald-200 mt-0.5">MTN: <strong>{MOMO_CONFIG.mtnNumber}</strong> | Name: <strong>{MOMO_CONFIG.accountName}</strong></div>
             </div>
           </div>
 
@@ -90,9 +90,12 @@ export const Footer: React.FC<FooterProps> = ({
           </p>
 
           <div className="pt-2 space-y-2 text-xs text-slate-300">
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Email: <strong className="text-white">{MOMO_CONFIG.email}</strong></span>
+            <div className="flex items-start gap-2">
+              <Mail className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <div className="flex flex-col gap-0.5">
+                <span>Email: <a href="mailto:info@kerdfarms.com" className="font-bold text-white hover:text-emerald-300 transition-colors">info@kerdfarms.com</a></span>
+                <span className="text-[11px] text-slate-400"><a href="mailto:kerdfarms@gmail.com" className="hover:text-emerald-300 transition-colors">kerdfarms@gmail.com</a></span>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -209,7 +212,7 @@ export const Footer: React.FC<FooterProps> = ({
                 </button>
               </div>
               <div className="text-[10px] text-slate-500">
-                Submissions automatically sent to kerdfarms@gmail.com.
+                Submissions automatically sent to info@kerdfarms.com &amp; kerdfarms@gmail.com.
               </div>
             </form>
           )}
@@ -227,18 +230,20 @@ export const Footer: React.FC<FooterProps> = ({
 
       </div>
 
-      {/* Bottom Legal & Copyright Bar (Preserved exactly as requested) */}
+      {/* Bottom Legal & Copyright Bar */}
       <div className="border-t border-slate-900 bg-slate-950 px-4 py-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-center sm:text-left">
           <div>
             © {new Date().getFullYear()} Kerd Farms. All Rights Reserved. Ghana's trusted partner in agriculture.
           </div>
-          <div className="flex items-center gap-4 text-[11px]">
-            <span>MoMo Payments Verified</span>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-[11px]">
+            <span>MoMo Verified: <strong>{MOMO_CONFIG.accountName}</strong></span>
             <span aria-hidden="true">·</span>
-            <span>Direct Email to kerdfarms@gmail.com</span>
+            <span><a href="mailto:info@kerdfarms.com" className="hover:text-emerald-400 underline">info@kerdfarms.com</a></span>
             <span aria-hidden="true">·</span>
-            <span>Accra & Volta Region</span>
+            <span><a href="mailto:kerdfarms@gmail.com" className="hover:text-emerald-400 underline">kerdfarms@gmail.com</a></span>
+            <span aria-hidden="true">·</span>
+            <span>Accra &amp; Volta Region</span>
           </div>
         </div>
       </div>

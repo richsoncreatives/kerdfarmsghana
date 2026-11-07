@@ -28,7 +28,7 @@ export const ContactView: React.FC = () => {
     const submission: EnquirySubmission = {
       enquiryType: subject as any,
       fullName: fullName.trim(),
-      email: email.trim() || 'kerdfarms@gmail.com',
+      email: email.trim() || 'info@kerdfarms.com',
       phone: phone.trim(),
       message: message.trim(),
       submittedAt: new Date().toISOString()
@@ -61,7 +61,7 @@ export const ContactView: React.FC = () => {
           Talk to the Kerd Farms Team.
         </h1>
         <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-          Whether you need fresh eggs, fruits and vegetables, seedlings, or organic manure, we route every enquiry directly to <strong>{MOMO_CONFIG.email}</strong>.
+          Whether you need fresh eggs, fruits and vegetables, seedlings, or organic manure, we route every enquiry directly to our team at <strong>info@kerdfarms.com</strong> and <strong>kerdfarms@gmail.com</strong>.
         </p>
       </div>
 
@@ -81,9 +81,14 @@ export const ContactView: React.FC = () => {
                   <Mail className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-slate-400 font-medium">Email Submissions</div>
-                  <div className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">{MOMO_CONFIG.email}</div>
-                  <div className="text-[11px] text-slate-500">Checked daily by farm operations</div>
+                  <div className="text-slate-400 font-medium">Official Email Inquiries</div>
+                  <div className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">
+                    <a href="mailto:info@kerdfarms.com" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">info@kerdfarms.com</a>
+                  </div>
+                  <div className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                    <a href="mailto:kerdfarms@gmail.com" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">kerdfarms@gmail.com</a>
+                  </div>
+                  <div className="text-[11px] text-slate-500 mt-1">Checked daily by farm operations</div>
                 </div>
               </div>
 
@@ -133,7 +138,7 @@ export const ContactView: React.FC = () => {
               Send us an Enquiry
             </h2>
             <p className="text-xs text-slate-500">
-              Fill out the form below. Your message will be automatically emailed to <strong>{MOMO_CONFIG.email}</strong>.
+              Fill out the form below. Your message will be sent directly to <strong>info@kerdfarms.com</strong> &amp; <strong>kerdfarms@gmail.com</strong>.
             </p>
           </div>
 
@@ -142,7 +147,7 @@ export const ContactView: React.FC = () => {
               <CheckCircle2 className="w-10 h-10 text-emerald-600 dark:text-emerald-400 mx-auto" />
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Message Sent Successfully!</h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 max-w-sm mx-auto">
-                Thank you! Your message has been sent directly to <strong>{MOMO_CONFIG.email}</strong>. We will contact you shortly.
+                Thank you! Your message has been sent directly to <strong>info@kerdfarms.com</strong> and <strong>kerdfarms@gmail.com</strong>. We will contact you shortly.
               </p>
               <button
                 onClick={() => setSubmitted(false)}
@@ -245,12 +250,12 @@ export const ContactView: React.FC = () => {
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Transmitting to kerdfarms@gmail.com...</span>
+                    <span>Transmitting to info@kerdfarms.com...</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4 text-amber-300" />
-                    <span>Send Message to kerdfarms@gmail.com</span>
+                    <span>Send Message to Kerd Farms</span>
                   </>
                 )}
               </button>

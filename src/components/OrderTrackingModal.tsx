@@ -61,7 +61,7 @@ export const OrderTrackingModal: React.FC<OrderTrackingModalProps> = ({
             </div>
             <div>
               <h2 className="text-lg font-bold">Kerd Farms Order Tracking & Confirmation</h2>
-              <p className="text-xs text-emerald-200">Sent to kerdfarms@gmail.com for Manual Confirmation</p>
+              <p className="text-xs text-emerald-200">Sent to info@kerdfarms.com and kerdfarms@gmail.com for Confirmation</p>
             </div>
           </div>
           <button

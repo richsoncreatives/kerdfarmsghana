@@ -89,7 +89,7 @@ export const OurImpactView: React.FC<OurImpactViewProps> = ({ onOpenEnquiry }) =
       <div className="bg-amber-500 text-slate-950 p-8 sm:p-10 rounded-3xl text-center space-y-4 shadow-lg">
         <h2 className="text-2xl font-extrabold">Partner With Us on Child Nutrition</h2>
         <p className="text-xs sm:text-sm text-slate-900 max-w-xl mx-auto leading-relaxed">
-          Are you an NGO, school board, or corporate sponsor wanting to support egg feeding programmes in Ghana? All partnership enquiries go directly to <strong>kerdfarms@gmail.com</strong>.
+          Are you an NGO, school board, or corporate sponsor wanting to support egg feeding programmes in Ghana? All partnership enquiries go directly to <strong>info@kerdfarms.com</strong> and <strong>kerdfarms@gmail.com</strong>.
         </p>
         <button
           onClick={() => onOpenEnquiry('Impact / One Egg')}

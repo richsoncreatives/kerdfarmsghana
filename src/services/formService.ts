@@ -94,11 +94,32 @@ export function getOrderByID(id: string): OrderSubmission | null {
 
 export function getWhatsAppOrderLink(order: OrderSubmission): string {
   const phoneNumber = '233240135545';
-  const text = `Hello Kerd Farms, I would like to inquire about my Order #${order.orderId}.
-Name: ${order.customerName}
-Phone: ${order.customerPhone}
-Total: GH₵ ${order.totalAmount}
-Payment Status: ${order.paymentStatus || 'Pending'}`;
+  
+  const itemLines = (order.items || [])
+    .map((item, idx) => {
+      const name = item.product?.name || 'Produce Item';
+      const unit = item.product?.unit || 'Standard Unit';
+      const price = typeof item.product?.price === 'number' ? `GH₵ ${item.product.price.toFixed(2)}` : 'Quote';
+      return `${idx + 1}. ${name} (${unit}) - Qty: ${item.quantity} - ${price}`;
+    })
+    .join('\n');
+
+  const text = `Hello Kerd Farms (+233 24 013 5545), I would like to inquire about my Order #${order.orderId}.
+
+*Customer Name:* ${order.customerName || 'Valued Customer'}
+*Customer Phone:* ${order.customerPhone || 'N/A'}
+*Delivery Location:* ${order.deliveryCity || 'Ghana'} - ${order.deliveryAddress || ''}
+
+*--- ORDERED ITEMS ---*
+${itemLines || 'No items listed'}
+
+*Total Amount:* GH₵ ${order.totalAmount}
+*Payment Method:* Mobile Money (MoMo)
+*MoMo Account Name:* DANIEL KERDMOTT ESSIEN
+*Payment Status:* ${order.paymentStatus || 'Pending Confirmation'}
+
+Please confirm product availability and delivery arrangements. Thank you!`;
+
   return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`;
 }
 

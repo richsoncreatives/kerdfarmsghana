@@ -214,7 +214,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
             Need Contract / Wholesale Institutional Supply?
           </h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl">
-            Supermarkets, hotels, restaurants, schools, and distributors can request custom wholesale quotes and standing weekly deliveries routed directly to kerdfarms@gmail.com.
+            Supermarkets, hotels, restaurants, schools, and distributors can request custom wholesale quotes and standing weekly deliveries routed directly to info@kerdfarms.com and kerdfarms@gmail.com.
           </p>
         </div>
 

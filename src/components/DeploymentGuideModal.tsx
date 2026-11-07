@@ -57,7 +57,7 @@ export const DeploymentGuideModal: React.FC<DeploymentGuideModalProps> = ({
                 Pre-configured for Static Hosting
               </div>
               <div className="text-emerald-800 dark:text-emerald-300 leading-relaxed">
-                This applet contains <code className="bg-emerald-100 dark:bg-emerald-900 px-1 py-0.5 rounded font-mono">public/_redirects</code> for Cloudflare Pages and <code className="bg-emerald-100 dark:bg-emerald-900 px-1 py-0.5 rounded font-mono">public/404.html</code> for GitHub Pages. All forms submit directly to <strong>kerdfarms@gmail.com</strong> via FormSubmit AJAX.
+                This applet contains <code className="bg-emerald-100 dark:bg-emerald-900 px-1 py-0.5 rounded font-mono">public/_redirects</code> for Cloudflare Pages and <code className="bg-emerald-100 dark:bg-emerald-900 px-1 py-0.5 rounded font-mono">public/404.html</code> for GitHub Pages. All forms submit directly to <strong>info@kerdfarms.com</strong> and <strong>kerdfarms@gmail.com</strong> via FormSubmit AJAX.
               </div>
             </div>
           </div>
@@ -119,8 +119,8 @@ export const DeploymentGuideModal: React.FC<DeploymentGuideModalProps> = ({
           <div className="p-4 bg-slate-100 dark:bg-slate-800/80 rounded-2xl space-y-2">
             <h4 className="font-bold text-slate-900 dark:text-white">Form & Order Handling Summary</h4>
             <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400 text-[11px]">
-              <li><strong>Target Email:</strong> All enquiries and MoMo orders are emailed directly to <strong className="text-slate-900 dark:text-white">kerdfarms@gmail.com</strong>.</li>
-              <li><strong>Mobile Money:</strong> Customers pay to MoMo number 024 013 5545 (KERD FARMS), then click "I Have Paid & Submit Order".</li>
+              <li><strong>Target Email:</strong> All enquiries and MoMo orders are emailed directly to <strong className="text-slate-900 dark:text-white">info@kerdfarms.com</strong> and <strong className="text-slate-900 dark:text-white">kerdfarms@gmail.com</strong>.</li>
+              <li><strong>Mobile Money:</strong> Customers pay to MoMo account <strong>DANIEL KERDMOTT ESSIEN</strong> (024 013 5545), then click "I Have Paid &amp; Submit Order" or "Confirm &amp; Send Order via WhatsApp".</li>
               <li><strong>Order ID Tracking:</strong> Orders are stored in local storage and can be tracked using their Order ID (`#KF-XXXXX`).</li>
             </ul>
           </div>

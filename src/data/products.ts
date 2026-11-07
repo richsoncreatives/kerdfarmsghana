@@ -441,12 +441,15 @@ export const PRODUCTS: Product[] = [
 ];
 
 export const MOMO_CONFIG = {
-  accountName: 'KERD FARMS',
+  accountName: 'DANIEL KERDMOTT ESSIEN',
+  businessName: 'KERD FARMS',
   mtnNumber: '024 013 5545',
   telecelNumber: '024 013 5545',
   airtelTigoNumber: '024 013 5545',
   primaryPhone: '+233 24 013 5545',
-  email: 'kerdfarms@gmail.com',
-  location: 'Accra & Volta Region, Ghana',
+  email: 'info@kerdfarms.com',
+  primaryEmail: 'info@kerdfarms.com',
+  secondaryEmail: 'kerdfarms@gmail.com',
+  location: 'Abokobi, Accra & Volta Region, Ghana',
   whatsappNumber: '233240135545'
 };
