@@ -98,6 +98,8 @@ if (process.env.NODE_ENV === 'production') {
   app.use(vite.middlewares);
 }
 
-app.listen(PORT, () => {
-  console.log(`Kerd Farms multi-page server running on http://localhost:${PORT}`);
+const portNumber = Number(process.env.PORT) || 3000;
+app.listen(portNumber, '0.0.0.0', () => {
+  console.log(`Kerd Farms multi-page server running on http://0.0.0.0:${portNumber}`);
 });
+
